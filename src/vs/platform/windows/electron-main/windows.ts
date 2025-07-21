@@ -133,8 +133,14 @@ export function defaultBrowserWindowOptions(accessor: ServicesAccessor, windowSt
 
 	const windowSettings = configurationService.getValue<IWindowSettings | undefined>('window');
 
+	// Check if transparency is enabled
+	const transparencyEnabled = configurationService.getValue<boolean>('window.experimental.transparency.enabled') ?? false;
+	const transparencyOpacity = configurationService.getValue<number>('window.experimental.transparency.opacity') ?? 0.8;
+
 	const options: electron.BrowserWindowConstructorOptions & { experimentalDarkMode: boolean; accentColor?: boolean | string } = {
-		backgroundColor: themeMainService.getBackgroundColor(),
+		backgroundColor: transparencyEnabled ? 'rgba(0, 0, 0, 0)' : themeMainService.getBackgroundColor(),
+		transparent: transparencyEnabled,
+		opacity: transparencyEnabled ? transparencyOpacity : undefined,
 		minWidth: WindowMinimumSize.WIDTH,
 		minHeight: WindowMinimumSize.HEIGHT,
 		title: productService.nameLong,
@@ -180,9 +186,19 @@ export function defaultBrowserWindowOptions(accessor: ServicesAccessor, windowSt
 	if (isMacintosh) {
 		options.acceptFirstMouse = true; // enabled by default
 
+		// Only apply vibrancy effect when transparency is enabled
+		if (transparencyEnabled) {
+			options.vibrancy = 'under-window';
+		}
+
 		if (windowSettings?.clickThroughInactive === false) {
 			options.acceptFirstMouse = false;
 		}
+	}
+
+	if (isWindows && transparencyEnabled) {
+		// Only apply acrylic effect when transparency is enabled
+		options.backgroundMaterial = 'acrylic';
 	}
 
 	if (overrides?.disableFullscreen) {

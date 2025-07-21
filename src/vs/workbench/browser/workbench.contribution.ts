@@ -14,6 +14,8 @@ import { WorkbenchPhase, registerWorkbenchContribution2 } from '../common/contri
 import { CustomEditorLabelService } from '../services/editor/common/customEditorLabelService.js';
 import { ActivityBarPosition, EditorActionsLocation, EditorTabsMode, LayoutSettings } from '../services/layout/browser/layoutService.js';
 import { defaultWindowTitle, defaultWindowTitleSeparator } from './parts/titlebar/windowTitle.js';
+import './windowTransparency.contribution.js';
+import { WindowTransparencyService } from './windowTransparencyService.js';
 
 const registry = Registry.as<IConfigurationRegistry>(ConfigurationExtensions.Configuration);
 
@@ -954,3 +956,6 @@ Registry.as<IConfigurationMigrationRegistry>(Extensions.ConfigurationMigration)
 			return result;
 		}
 	}]);
+
+// Register window transparency service
+registerWorkbenchContribution2(WindowTransparencyService.ID, WindowTransparencyService, WorkbenchPhase.AfterRestored);
